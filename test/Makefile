@@ -42,20 +42,20 @@ CPP_BACKUP_FILES = *.cpp~
 
 all: debug release
 
-vec_testd.o:
+vector_testd.o:
 	@mkdir -p $(BUILD_DIR)
 	@mkdir -p $(DEBUG_DIR)
 	$(CXX) -c $(CPP_FILES) $(CPP_FLAGS_DEBUG) $(INCLUDE_FLAGS) -o $(O_FILE_TEST_DEBUG)
 
-vec_test.o:
+vector_test.o:
 	@mkdir -p $(BUILD_DIR)
 	@mkdir -p $(RELEASE_DIR)
 	$(CXX) -c $(CPP_FILES) $(CPP_FLAGS_RELEASE) $(INCLUDE_FLAGS) -o $(O_FILE_TEST_RELEASE)	
 
-debug:	vec_testd.o
+debug:	vector_testd.o
 	$(CXX) $(O_FILES_DEBUG) -o $(DEBUG_DIR)/$(PROGRAM_DEBUG)
 
-release: vec_test.o
+release: vector_test.o
 	$(CXX) $(O_FILES_RELEASE) -o $(RELEASE_DIR)/$(PROGRAM_RELEASE)
 
 clean:
