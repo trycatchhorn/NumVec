@@ -79,9 +79,10 @@ public:
   explicit Vector(std::initializer_list<T> values);
   Vector( const Vector<T>& other );
   Vector<T>& operator = ( const Vector<T> &other );
-  auto& operator [] ( int i );
+  auto& operator [] ( size_t index);
   bool empty() const;
   void insert( const T element );
+  size_t size() const;
 };
 
 template<typename T>
@@ -104,9 +105,14 @@ Vector<T>& Vector<T>::operator = ( const Vector<T> &other ) {
 }
 
 template<typename T>
-auto& Vector<T>::operator [] ( int i ) {
+auto& Vector<T>::operator [] ( size_t i ) {
   assert( i >= 0 && i < base.size() );
   return base[i];
+}
+
+template<typename T>
+bool Vector<T>::empty() const {
+  return base.empty();
 }
 
 template<typename T>
@@ -115,8 +121,8 @@ void Vector<T>::insert( const T element ) {
 }
 
 template<typename T>
-bool Vector<T>::empty() const {
-  return base.empty();
+size_t Vector<T>::size() const {
+  return base.size();
 }
 
 // vector + scalar
