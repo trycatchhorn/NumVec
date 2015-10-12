@@ -71,7 +71,7 @@ private:
   template<typename T1, typename T2>
   friend bool operator != ( const Vector<T1> & lhs, const Vector<T2> & rhs );
 
-
+  // Output stream operator
   friend std::ostream& operator << <T> ( std::ostream& s, const Vector<T>& other );
 
 public:
@@ -80,6 +80,10 @@ public:
   Vector( const Vector<T>& other );
   Vector<T>& operator = ( const Vector<T> &other );
   auto& operator [] ( size_t index);
+
+  Vector& operator += ( T scalar );
+
+
   bool empty() const;
   void insert( const T element );
   size_t size() const;
@@ -109,6 +113,19 @@ auto& Vector<T>::operator [] ( size_t i ) {
   assert( i >= 0 && i < base.size() );
   return base[i];
 }
+
+
+
+template<typename T>
+Vector<T>& Vector<T>::operator += ( T scalar ) {
+  for (auto& e : base) {
+    e += scalar;
+  }
+  return *this;
+}
+
+
+
 
 template<typename T>
 bool Vector<T>::empty() const {

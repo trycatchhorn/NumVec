@@ -287,6 +287,18 @@ void test_vector_int_vector_float_addition() {
   std::cout << "res = v1 + v2 = " << v1 << " + " << v2 << " = " << res << std::endl;
 }
 
+// vector += scalar (vector int and scalar int)
+void test_vector_int_scalar_int_addition_assignment() {
+  // Create vector v1
+  auto v1 = Vector<int>( { 1, 2, 3 } );
+  // Create scalar s
+  int s = 3;
+  // vector += scalar
+  std::cout << "res = v1 += s = " << v1 << " += " << s << " = ";
+  v1 += s;
+  std::cout << v1 << std::endl;
+}
+
 // vector - scalar (vector int and scalar int)
 void test_vector_int_scalar_int_subtraction() {
   // Create vector
@@ -619,6 +631,9 @@ int main() {
   test_vector_short_vector_short_addition();
   test_vector_long_vector_long_addition();
   test_vector_int_vector_float_addition();
+
+  // Test vector += scalar operators
+  test_vector_int_scalar_int_addition_assignment();
 
   // Test vector - scalar operators
   test_vector_int_scalar_int_subtraction();
