@@ -5,7 +5,7 @@ Simple vector class showing basic numeric operations on a vector of arbitrary le
 std::vector.
 
 # Compiler
-The code uses C+14 features available in gcc version >= 5.1.1, which is stardard in Fedora 22. 
+The code uses C++14 features available in gcc version >= 5.1.1.
 
 
 

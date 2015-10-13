@@ -288,7 +288,7 @@ void test_vector_int_vector_float_addition() {
 }
 
 // vector += scalar (vector int and scalar int)
-void test_vector_int_scalar_int_addition_assignment() {
+void test_vector_int_scalar_int_compound_addition_assignment() {
   // Create vector v1
   auto v1 = Vector<int>( { 1, 2, 3 } );
   // Create scalar s
@@ -298,6 +298,30 @@ void test_vector_int_scalar_int_addition_assignment() {
   v1 += s;
   std::cout << v1 << std::endl;
 }
+
+
+// vector += vector (vector int and vector int)
+bool test_vector_int_vector_int_compound_addition_assignment() {
+  bool result = false;
+  // Create reference vector
+  auto ref = Vector<int>( { 5, 7, 9 } );
+  // Create vector v1
+  auto v1 = Vector<int>( { 1, 2, 3 } );
+  // Create vector v2
+  auto v2 = Vector<int>( { 4, 5, 6 } );
+  // vector += vector
+  std::cout << "res = v1 += v2 = " << v1 << " += " << v2 << " = ";
+  v1 += v2;
+  std::cout << v1 << std::endl;
+  if( ref == v1 ) {
+    result = true;
+  }
+  return result;
+}
+
+
+
+
 
 // vector - scalar (vector int and scalar int)
 void test_vector_int_scalar_int_subtraction() {
@@ -633,7 +657,8 @@ int main() {
   test_vector_int_vector_float_addition();
 
   // Test vector += scalar operators
-  test_vector_int_scalar_int_addition_assignment();
+  test_vector_int_scalar_int_compound_addition_assignment();
+  assert( test_vector_int_vector_int_compound_addition_assignment() );
 
   // Test vector - scalar operators
   test_vector_int_scalar_int_subtraction();

@@ -80,10 +80,8 @@ public:
   Vector( const Vector<T>& other );
   Vector<T>& operator = ( const Vector<T> &other );
   auto& operator [] ( size_t index);
-
-  Vector& operator += ( T scalar );
-
-
+  Vector& operator += ( const T scalar );
+  Vector& operator += ( const Vector<T> & other );
   bool empty() const;
   void insert( const T element );
   size_t size() const;
@@ -114,18 +112,21 @@ auto& Vector<T>::operator [] ( size_t i ) {
   return base[i];
 }
 
-
-
 template<typename T>
-Vector<T>& Vector<T>::operator += ( T scalar ) {
-  for (auto& e : base) {
+Vector<T>& Vector<T>::operator += ( const T scalar ) {
+  for( auto& e : base ) {
     e += scalar;
   }
   return *this;
 }
 
-
-
+template<typename T>
+Vector<T>& Vector<T>::operator += ( const Vector<T> & other ) {
+  for( auto i = 0u; i < base.size(); ++i ) {
+    base[i] += other.base[i];
+  }
+  return *this;
+}
 
 template<typename T>
 bool Vector<T>::empty() const {
