@@ -7,7 +7,7 @@
 
 # Name of compiler and standard compiler flags.
 CXX = g++
-CPP_FLAGS_DEBUG = -std=c++14 -g -O0 -Wall -Wextra -Wconversion -pedantic -pthread
+CPP_FLAGS_DEBUG = -std=c++14 -DNDEBUG -g -O0 -Wall -Wextra -Wconversion -pedantic -pthread
 CPP_FLAGS_RELEASE = -std=c++14 -O2 -Wall -Wextra -Wconversion -pedantic -pthread
 
 # Directory structure for the build.

@@ -3,6 +3,13 @@
 #include <algorithm>
 #include <cassert>
 
+#include <cmath>
+#include <limits>
+#include <iomanip>
+
+#include <type_traits>
+
+
 /* The MIT License (MIT)
 #
 # Copyright (c) 2015 by Brian Horn, trycatchhorn@gmail.com.
@@ -28,6 +35,7 @@
 
 template<typename T> class Vector;
 template<typename T> std::ostream& operator<< ( std::ostream& s, const Vector<T>& other );
+template<typename U> typename std::enable_if<!std::numeric_limits<U>::is_integer, bool>::type almostEqual( U x, U y, int ulp );
 
 template<typename T>
 class Vector {
@@ -39,33 +47,37 @@ private:
 
   // vector + scalar
   template<typename T1, typename T2>
-  friend auto operator + ( const Vector<T1> & lhs, const T2 & scalar ) -> Vector<std::common_type_t<T1,T2>>;
+  friend auto operator + ( const Vector<T1> & lhs, const T2 & scalar ) -> Vector<std::common_type_t<T1, T2>>;
 
   // scalar + vector
   template<typename T1, typename T2>
-  friend auto operator + ( const T1 & scalar, const Vector<T2> & rhs ) -> Vector<std::common_type_t<T1,T2>>;
+  friend auto operator + ( const T1 & scalar, const Vector<T2> & rhs ) -> Vector<std::common_type_t<T1, T2>>;
 
   // vector + vector
   template<typename T1, typename T2>
-  friend auto operator + ( const Vector<T1> & lhs, const Vector<T2> & rhs ) -> Vector<std::common_type_t<T1,T2>>;
+  friend auto operator + ( const Vector<T1> & lhs, const Vector<T2> & rhs ) -> Vector<std::common_type_t<T1, T2>>;
 
   /* Subtraction */
 
   // vector - scalar
   template<typename T1, typename T2>
-  friend auto operator - ( const Vector<T1> & lhs, const T2 & scalar ) -> Vector<std::common_type_t<T1,T2>>;
+  friend auto operator - ( const Vector<T1> & lhs, const T2 & scalar ) -> Vector<std::common_type_t<T1, T2>>;
 
   // scalar - vector
   template<typename T1, typename T2>
-  friend auto operator - ( const T1 & scalar, const Vector<T2> & rhs ) -> Vector<std::common_type_t<T1,T2>>;
+  friend auto operator - ( const T1 & scalar, const Vector<T2> & rhs ) -> Vector<std::common_type_t<T1, T2>>;
 
   // vector - vector
   template<typename T1, typename T2>
-  friend auto operator - ( const Vector<T1> & lhs, const Vector<T2> & rhs ) -> Vector<std::common_type_t<T1,T2>>;
+  friend auto operator - ( const Vector<T1> & lhs, const Vector<T2> & rhs ) -> Vector<std::common_type_t<T1, T2>>;
 
   // Equal operator
   template<typename T1, typename T2>
   friend bool operator == ( const Vector<T1> & lhs, const Vector<T2> & rhs );
+
+  friend bool operator == ( const Vector<float> & lhs, const Vector<float> & rhs );
+
+  friend bool operator == ( const Vector<double> & lhs, const Vector<double> & rhs );
 
   // Not equal operator
   template<typename T1, typename T2>
@@ -76,10 +88,10 @@ private:
 
 public:
   Vector();
-  explicit Vector(std::initializer_list<T> values);
+  explicit Vector( std::initializer_list<T> values );
   Vector( const Vector<T>& other );
   Vector<T>& operator = ( const Vector<T> &other );
-  auto& operator [] ( size_t index);
+  auto& operator [] ( size_t index );
   Vector& operator += ( const T scalar );
   Vector& operator += ( const Vector<T> & other );
   bool empty() const;
@@ -143,10 +155,31 @@ size_t Vector<T>::size() const {
   return base.size();
 }
 
+template<typename U>
+typename std::enable_if<!std::numeric_limits<U>::is_integer, bool>::type
+  almostEqual( U x, U y, int ulp )
+{
+  // The machine epsilon has to be scaled to the magnitude of the values used
+  // and multiplied by the desired precision in ULPs (units in the last place)
+
+  std::cout << "-----------------------------------" << std::endl;
+  std::cout << "std::abs( x - y ): " << std::abs( x - y ) << std::endl;
+  std::cout << "std::abs( x + y ): " << std::abs( x + y ) << std::endl;
+  std::cout << "std::numeric_limits<U>::epsilon(): " << std::numeric_limits<U>::epsilon() << std::endl;
+  std::cout << "std::numeric_limits<U>::epsilon() * std::abs( x + y ) * ulp: " << std::numeric_limits<U>::epsilon() * std::abs( x + y ) * ulp << std::endl;
+  std::cout << "std::abs( x - y ) < std::numeric_limits<U>::epsilon() * std::abs( x + y ) * ulp: " << (std::abs( x - y ) < std::numeric_limits<U>::epsilon() * std::abs( x + y ) * ulp) << std::endl;
+  std::cout << "std::abs( x - y ) < std::numeric_limits<U>::min(): " << (std::abs( x - y ) < std::numeric_limits<U>::min()) << std::endl;
+  std::cout << "-----------------------------------" << std::endl;
+
+  return std::abs( x - y ) < std::numeric_limits<U>::epsilon() * std::abs( x + y ) * ulp
+    // Unless the result is subnormal
+    || std::abs( x - y ) < std::numeric_limits<U>::min();
+}
+
 // vector + scalar
 template<typename T1, typename T2>
 auto operator + ( const Vector<T1> & lhs, const T2 & scalar )
-  -> Vector<std::common_type_t<T1,T2>>
+  -> Vector<std::common_type_t<T1, T2>>
 {
 
   using T3 = std::common_type_t<T1, T2>;
@@ -160,7 +193,7 @@ auto operator + ( const Vector<T1> & lhs, const T2 & scalar )
 // scalar + vector
 template<typename T1, typename T2>
   auto operator + ( const T1 & scalar, const Vector<T2> & rhs )
-  -> Vector<std::common_type_t<T1,T2>>
+  -> Vector<std::common_type_t<T1, T2>>
 {
   using T3 = std::common_type_t<T1, T2>;
   Vector<T3> result;
@@ -173,7 +206,7 @@ template<typename T1, typename T2>
 // vector + vector
 template<typename T1, typename T2>
   auto operator + ( const Vector<T1> & lhs, const Vector<T2> & rhs )
-  -> Vector<std::common_type_t<T1,T2>>
+  -> Vector<std::common_type_t<T1, T2>>
 {
   using T3 = std::common_type_t<T1, T2>;
   assert(lhs.base.size() == rhs.base.size());
@@ -231,6 +264,26 @@ bool operator == ( const Vector<T1> & lhs, const Vector<T2> & rhs ) {
   return lhs.base == rhs.base;
 }
 
+bool operator == ( const Vector<float> & lhs, const Vector<float> & rhs ) {
+  assert( lhs.base.size() == rhs.base.size() );
+  for( auto i = 0u; i < lhs.base.size(); ++i ) {
+    if ( !almostEqual( lhs.base[i], rhs.base[i], 2 ) ) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool operator == ( const Vector<double> & lhs, const Vector<double> & rhs ) {
+  assert( lhs.base.size() == rhs.base.size() );
+  for( auto i = 0u; i < lhs.base.size(); ++i ) {
+    if ( !almostEqual( lhs.base[i], rhs.base[i], 2 ) ) {
+      return false;
+    }
+  }
+  return true;
+}
+
 // Not equal operator
 template<typename T1, typename T2>
 bool operator != ( const Vector<T1> & lhs, const Vector<T2> & rhs ) {
@@ -251,6 +304,5 @@ std::ostream& operator<< ( std::ostream& s, const Vector<T>& other ) {
   s << other.base[other.base.size() - 1] << ")";
   return s;
 }
-
 
 
