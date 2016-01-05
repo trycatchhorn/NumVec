@@ -855,7 +855,6 @@ bool test_vector_not_equal_operator() {
 }
 
 int main() {
-  /*
   // Test vector constructors
   if( test_vector_empty_constructor() ) {
     std::cout << "test_vector_empty_constructor -> OK" << std::endl;
@@ -997,8 +996,12 @@ int main() {
   } else {
     std::cout << "test_vector_long_scalar_long_subtraction -> FAIL" << std::endl;
   }
-  */
 
+
+
+
+
+  
 
   if( test_vector_int_scalar_float_subtraction() ) {
     std::cout << "test_vector_int_scalar_float_subtraction -> OK" << std::endl;
@@ -1006,7 +1009,12 @@ int main() {
     std::cout << "test_vector_int_scalar_float_subtraction -> FAIL" << std::endl;
   }
 
-  /*
+
+
+
+
+
+
   // Test scalar - vector operators
   if( test_scalar_int_vector_int_subtraction() ) {
     std::cout << "test_scalar_int_vector_int_subtraction -> OK" << std::endl;
@@ -1080,7 +1088,6 @@ int main() {
   } else {
     std::cout << "test_vector_not_equal_operator -> FAIL" << std::endl;
   }
-  */
   return 0;
 }
 

@@ -2,13 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <cassert>
-
-#include <cmath>
-#include <limits>
-#include <iomanip>
-
-#include <type_traits>
-
+#include "FloatingPoint.h"
 
 /* The MIT License (MIT)
 #
@@ -156,24 +150,11 @@ size_t Vector<T>::size() const {
 }
 
 template<typename U>
-typename std::enable_if<!std::numeric_limits<U>::is_integer, bool>::type
-  almostEqual( U x, U y, int ulp )
-{
-  // The machine epsilon has to be scaled to the magnitude of the values used
-  // and multiplied by the desired precision in ULPs (units in the last place)
-
-  std::cout << "-----------------------------------" << std::endl;
-  std::cout << "std::abs( x - y ): " << std::abs( x - y ) << std::endl;
-  std::cout << "std::abs( x + y ): " << std::abs( x + y ) << std::endl;
-  std::cout << "std::numeric_limits<U>::epsilon(): " << std::numeric_limits<U>::epsilon() << std::endl;
-  std::cout << "std::numeric_limits<U>::epsilon() * std::abs( x + y ) * ulp: " << std::numeric_limits<U>::epsilon() * std::abs( x + y ) * ulp << std::endl;
-  std::cout << "std::abs( x - y ) < std::numeric_limits<U>::epsilon() * std::abs( x + y ) * ulp: " << (std::abs( x - y ) < std::numeric_limits<U>::epsilon() * std::abs( x + y ) * ulp) << std::endl;
-  std::cout << "std::abs( x - y ) < std::numeric_limits<U>::min(): " << (std::abs( x - y ) < std::numeric_limits<U>::min()) << std::endl;
-  std::cout << "-----------------------------------" << std::endl;
-
-  return std::abs( x - y ) < std::numeric_limits<U>::epsilon() * std::abs( x + y ) * ulp
-    // Unless the result is subnormal
-    || std::abs( x - y ) < std::numeric_limits<U>::min();
+bool almostEqual( U x, U y ) {
+  typedef float RawType;      // float -> double for different output
+  RawType xx = static_cast<RawType>( x );
+  RawType yy = static_cast<RawType>( y );
+  return FloatingPoint<RawType>( xx ).AlmostEquals(FloatingPoint<RawType>( yy ) );
 }
 
 // vector + scalar
@@ -267,7 +248,7 @@ bool operator == ( const Vector<T1> & lhs, const Vector<T2> & rhs ) {
 bool operator == ( const Vector<float> & lhs, const Vector<float> & rhs ) {
   assert( lhs.base.size() == rhs.base.size() );
   for( auto i = 0u; i < lhs.base.size(); ++i ) {
-    if ( !almostEqual( lhs.base[i], rhs.base[i], 2 ) ) {
+    if ( !almostEqual( lhs.base[i], rhs.base[i] ) ) {
       return false;
     }
   }
@@ -277,7 +258,7 @@ bool operator == ( const Vector<float> & lhs, const Vector<float> & rhs ) {
 bool operator == ( const Vector<double> & lhs, const Vector<double> & rhs ) {
   assert( lhs.base.size() == rhs.base.size() );
   for( auto i = 0u; i < lhs.base.size(); ++i ) {
-    if ( !almostEqual( lhs.base[i], rhs.base[i], 2 ) ) {
+    if ( !almostEqual( lhs.base[i], rhs.base[i] ) ) {
       return false;
     }
   }
