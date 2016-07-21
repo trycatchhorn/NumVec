@@ -2,7 +2,8 @@
 #include <vector>
 #include <algorithm>
 #include <cassert>
-#include "FloatingPoint.h"
+#include <cmath>
+//#include "FloatingPoint.h"
 
 /* The MIT License (MIT)
 #
@@ -93,12 +94,136 @@ public:
   size_t size() const;
 };
 
+union Float_t {
+    // Float precision (32 bits):
+    //
+    // 1 sign bit | 8-bit exponent | 23-bit mantissa
+    //
+    Float_t( float num = 0.0f ) : f( num ) {}
+    // Portable extraction of float components.
+    bool Negative() const { return i < 0; }
+    int32_t RawMantissa() const { return i & ( ( 1 << 23 ) - 1 ); }
+    int32_t RawExponent() const { return ( i >> 23 ) & 0xFF; }
+
+    int32_t i;
+    float f;
+};
+
+union Double_t {
+  // Double precision (64 bits):
+  //
+  // 1 sign bit | 11-bit exponent | 52-bit mantissa
+  //
+  Double_t( double num = 0.0 ) : d( num ) {}
+  // Portable extraction of double components.
+  bool Negative() const { return ( i >> 63 ) != 0; }
+  int64_t RawMantissa() const { return i & ( ( 1LL << 52 ) - 1 ); }
+  int64_t RawExponent() const { return ( i >> 52 ) & 0x7FF; }
+
+  int64_t i;
+  double d;
+};
+
+union FloatingPoint_t {
+  Float_t singleFloat;
+  Double_t doubleFloat;
+};
+
+bool almostEqualUlpsAndAbs( float x, float y, float maxDiff, int maxUlpsDiff ) {
+  // Check if the numbers are really close -- needed
+  // when comparing numbers near zero.
+  auto diff = std::abs(x - y);
+  if ( diff <= maxDiff ) {
+    return true;
+  }
+
+  Float_t uA( x );
+  Float_t uB( y );
+
+  // Different signs means they do not match.
+  if ( uA.Negative() != uB.Negative() ) {
+    return false;
+  }
+
+  // Find the difference in ULPs.
+  int ulpsDiff = std::abs( uA.i - uB.i );
+  if ( ulpsDiff <= maxUlpsDiff ) {
+    return true;
+  }
+  return false;
+}
+
+bool almostEqualUlpsAndAbs( double x, double y, double maxDiff, int maxUlpsDiff ) {
+  // Check if the numbers are really close -- needed
+  // when comparing numbers near zero.
+  auto diff = std::abs(x - y);
+  if ( diff <= maxDiff ) {
+    return true;
+  }
+
+  Double_t uA( x );
+  Double_t uB( y );
+
+  // Different signs means they do not match.
+  if ( uA.Negative() != uB.Negative() ) {
+    return false;
+  }
+
+  // Find the difference in ULPs.
+  int ulpsDiff = std::abs( uA.i - uB.i );
+  if ( ulpsDiff <= maxUlpsDiff ) {
+    return true;
+  }
+  return false;
+}
+
+bool almostEqualRelativeAndAbs( float x, float y, float maxDiff, float maxRelDiff = std::numeric_limits<float>::epsilon() ) {
+  // Check if the numbers are really close -- needed
+  // when comparing numbers near zero.
+  auto diff = std::abs( x - y );
+  if ( diff <= maxDiff ) {
+    return true;
+  }
+
+  x = std::abs( x );
+  y = std::abs( y );
+  auto largest = ( y > x ) ? y : x;
+
+  if ( diff <= largest * maxRelDiff ) {
+    return true;
+  }
+  return false;
+}
+
+bool almostEqualRelativeAndAbs( double x, double y, double maxDiff, double maxRelDiff = std::numeric_limits<double>::epsilon() ) {
+  // Check if the numbers are really close -- needed
+  // when comparing numbers near zero.
+  auto diff = std::abs( x - y );
+  if ( diff <= maxDiff ) {
+    return true;
+  }
+
+  x = std::abs( x );
+  y = std::abs( y );
+  auto largest = ( y > x ) ? y : x;
+
+  if ( diff <= largest * maxRelDiff ) {
+    return true;
+  }
+  return false;
+}
+
+template<typename U>
+bool almostEqual( U x, U y ) {
+  return almostEqualUlpsAndAbs( x, y, 1, 1 ) && almostEqualRelativeAndAbs( x, y, 1 );
+}
+
 template<typename T>
 Vector<T>::Vector() : base() {
 }
 
 template<typename T>
-Vector<T>::Vector(const std::initializer_list<T> values) : base() {
+Vector<T>::Vector( const std::initializer_list<T> values ) : base() {
   std::copy( values.begin(), values.end(), std::back_inserter( base ) );
 }
 
@@ -147,14 +272,6 @@ void Vector<T>::insert( const T element ) {
 template<typename T>
 size_t Vector<T>::size() const {
   return base.size();
-}
-
-template<typename U>
-bool almostEqual( U x, U y ) {
-  typedef float RawType;      // float -> double for different output
-  RawType xx = static_cast<RawType>( x );
-  RawType yy = static_cast<RawType>( y );
-  return FloatingPoint<RawType>( xx ).AlmostEquals(FloatingPoint<RawType>( yy ) );
 }
 
 // vector + scalar
@@ -268,7 +385,7 @@ bool operator == ( const Vector<double> & lhs, const Vector<double> & rhs ) {
 // Not equal operator
 template<typename T1, typename T2>
 bool operator != ( const Vector<T1> & lhs, const Vector<T2> & rhs ) {
-  return lhs.base != rhs.base;
+  return !( lhs.base == rhs.base );
 }
 
 template<typename T>

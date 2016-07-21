@@ -996,25 +996,11 @@ int main() {
   } else {
     std::cout << "test_vector_long_scalar_long_subtraction -> FAIL" << std::endl;
   }
-
-
-
-
-
-  
-
   if( test_vector_int_scalar_float_subtraction() ) {
     std::cout << "test_vector_int_scalar_float_subtraction -> OK" << std::endl;
   } else {
     std::cout << "test_vector_int_scalar_float_subtraction -> FAIL" << std::endl;
   }
-
-
-
-
-
-
-
   // Test scalar - vector operators
   if( test_scalar_int_vector_int_subtraction() ) {
     std::cout << "test_scalar_int_vector_int_subtraction -> OK" << std::endl;

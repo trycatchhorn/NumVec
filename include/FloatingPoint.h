@@ -100,8 +100,10 @@ private:
 
   Bits SignAndMagnitudeToBiased(const Bits& sam) const {
     if (kSignBitMask & sam) {
+      std::cout << "::a::" << std::endl;
       return ~sam + 1;  // two's complement
     } else {
+      std::cout << "::b::" << std::endl;
       return kSignBitMask | sam;  // * 2
     }
   }
