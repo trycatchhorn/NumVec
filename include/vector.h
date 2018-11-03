@@ -170,7 +170,7 @@ bool almostEqualUlpsAndAbs( double x, double y, double maxDiff, int maxUlpsDiff 
   }
 
   // Find the difference in ULPs.
-  int ulpsDiff = std::abs( uA.i - uB.i );
+  auto ulpsDiff = std::abs( uA.i - uB.i );
   if ( ulpsDiff <= maxUlpsDiff ) {
     return true;
   }

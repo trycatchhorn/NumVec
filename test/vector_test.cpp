@@ -384,7 +384,7 @@ bool test_vector_long_vector_long_addition() {
 bool test_vector_int_vector_float_addition() {
   bool result = false;
   // Create reference vector
-  auto ref = Vector<float>( { 3.1, 7.1, 11.1 } );
+  auto ref = Vector<float>( { 3.1f, 7.1f, 11.1f } );
   // Create vector v1
   auto v1 = Vector<int>( { 1, 3, 5 } );
   // Create vector v2
@@ -550,7 +550,7 @@ bool test_vector_long_scalar_long_subtraction(){
 bool test_vector_int_scalar_float_subtraction() {
   bool result = false;
   // Create reference vector
-  auto ref = Vector<float>( { -1.1f, -0.1f, 1.1 } );
+  auto ref = Vector<float>( { -1.1f, -0.1f, 1.1f } );
   // Create vector
   auto v = Vector<int>( { 1, 2, 3 } );
   // Create scalar
